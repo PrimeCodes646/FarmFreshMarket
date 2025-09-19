@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm2Table Checkout</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .checkout-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .checkout-container h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .cart-items {
+            margin-bottom: 2rem;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 1rem;
+        }
+        .cart-item-details {
+            flex: 1;
+        }
+        .cart-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: right;
+            margin-bottom: 2rem;
+        }
+        .payment-section {
+            margin-top: 2rem;
+        }
+        .payment-section label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .payment-section input {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .payment-section button {
+            width: 100%;
+            background: #388e3c;
+            color: #fff;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .success-message {
+            color: #388e3c;
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-container">
+        <h2>Checkout</h2>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be loaded here -->
+        </div>
+        <div class="cart-total" id="cartTotal">Total: ₦0</div>
+        <div class="payment-section">
+            <h3>Payment Details</h3>
+            <form id="paymentForm">
+                <label for="card">Card Number</label>
+                <input type="text" id="card" name="card" placeholder="1234 5678 9012 3456" required>
+                <label for="expiry">Expiry Date</label>
+                <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required>
+                <label for="cvc">CVC</label>
+                <input type="text" id="cvc" name="cvc" placeholder="123" required>
+                <button type="submit">Pay Now</button>
+            </form>
+            <div class="success-message" id="successMsg"></div>
+        </div>
+    </div>
+    <script>
+        // Fetch cart items from backend (simulate user cart)
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        let cart = [];
+        let total = 0;
+        async function loadCart() {
+            // For demo, fetch all products and treat as cart
+            try {
+                const res = await fetch('http://localhost:5000/api/products');
+                const products = await res.json();
+                cart = products.map(p => ({ ...p, qty: 1 }));
+            } catch {
+                cart = [
+                    { name: 'Fresh Tomatoes', price: 500, image: 'images/tomatoes.jpg', qty: 2 },
+                    { name: 'Farm Honey', price: 1500, image: 'images/honey.jpg', qty: 1 }
+                ];
+            }
+            renderCart();
+        }
+        function renderCart() {
+            cartItems.innerHTML = "";
+            total = 0;
+            cart.forEach(item => {
+                total += item.price * item.qty;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="cart-item-details">
+                        <strong>${item.name}</strong><br>
+                        Qty: ${item.qty}
+                    </div>
+                    <div>₦${item.price * item.qty}</div>
+                `;
+                cartItems.appendChild(div);
+            });
+            cartTotal.textContent = `Total: ₦${total}`;
+        }
+        loadCart();
+
+        // Payment form (connect to backend)
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const card = document.getElementById('card').value;
+            const expiry = document.getElementById('expiry').value;
+            const cvc = document.getElementById('cvc').value;
+            const successMsg = document.getElementById('successMsg');
+            successMsg.textContent = '';
+            // Simulate Stripe token (replace with real Stripe integration in production)
+            const token = 'tok_visa';
+            // For demo, use a static consumer name
+            const consumer = 'Demo Consumer';
+            try {
+                const res = await fetch('http://localhost:5000/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: total * 100, token, consumer, products: cart })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    successMsg.innerHTML = `Payment successful!<br>Your Order ID: <strong>${data.orderId}</strong><br><a href="order-tracking.html" style="color:#388e3c;font-weight:600;">Track your order</a>`;
+                } else {
+                    successMsg.textContent = 'Payment failed: ' + (data.error || 'Try again.');
+                }
+            } catch {
+                successMsg.textContent = 'Server error. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Farm2Table</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .admin-container {
+            max-width: 900px;
+            margin: 3rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .admin-header {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .admin-section {
+            margin-bottom: 2rem;
+        }
+        .admin-section h3 {
+            margin-bottom: 1rem;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .admin-table th, .admin-table td {
+            border: 1px solid #eee;
+            padding: 0.7rem;
+            text-align: left;
+        }
+        .admin-table th {
+            background: #f1f8e9;
+        }
+        .admin-table td {
+            background: #fff;
+        }
+        .admin-table button {
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">Admin Panel</div>
+        <div class="admin-section">
+            <h3>Manage Farmers</h3>
+            <table class="admin-table" id="farmersTable">
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    <!-- Farmers will be listed here -->
+                </tbody>
+            </table>
+        </div>
+        <div class="admin-section">
+            <h3>Manage Products</h3>
+            <table class="admin-table" id="productsTable">
+                <thead>
+                    <tr><th>Name</th><th>Price</th><th>Farmer</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    <!-- Products will be listed here -->
+                </tbody>
+            </table>
+        </div>
+        <div class="admin-section">
+            <h3>Analytics</h3>
+            <div style="display:flex;gap:1rem;justify-content:center;margin-bottom:1rem;">
+                <button class="chart-btn" data-type="orders">Orders</button>
+                <button class="chart-btn" data-type="revenue">Revenue</button>
+                <button class="chart-btn" data-type="avgOrder">Avg Order Value</button>
+                <button class="chart-btn" data-type="uploads">Product Uploads</button>
+                <button class="chart-btn" data-type="newUsers">New Users</button>
+            </div>
+            <canvas id="performanceChart" style="max-width:100%;height:300px;"></canvas>
+        .chart-btn {
+            background: #388e3c;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .chart-btn.active {
+            background: #2e7031;
+        }
+            <h3>Site Activity</h3>
+            <ul id="activityLog">
+                <!-- Activity log will be listed here -->
+            </ul>
+        </div>
+    </div>
+    <script>
+        // Chart.js performance chart
+        function renderPerformanceChart(data, labels) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (window.performanceChartInstance) {
+                window.performanceChartInstance.destroy();
+            }
+            window.performanceChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelText,
+                        data: data,
+                        borderColor: '#388e3c',
+                        backgroundColor: 'rgba(56,142,60,0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                        title: { display: true, text: labelText }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { title: { display: true, text: labelText }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+        // Fetch and render farmers, products, and activity from backend
+        async function loadAdminData() {
+            // Fetch analytics from backend
+            let analytics = null;
+            try {
+                const res = await fetch('http://localhost:5000/api/stats/analytics');
+                analytics = await res.json();
+            } catch {
+                // fallback demo data
+                analytics = {
+                    orders: [ {date:'Mon',value:12},{date:'Tue',value:19},{date:'Wed',value:7},{date:'Thu',value:14},{date:'Fri',value:20},{date:'Sat',value:9},{date:'Sun',value:15} ],
+                    revenue: [ {date:'Mon',value:12000},{date:'Tue',value:19000},{date:'Wed',value:7000},{date:'Thu',value:14000},{date:'Fri',value:20000},{date:'Sat',value:9000},{date:'Sun',value:15000} ],
+                    avgOrder: [ {date:'Mon',value:1000},{date:'Tue',value:1000},{date:'Wed',value:1000},{date:'Thu',value:1000},{date:'Fri',value:1000},{date:'Sat',value:1000},{date:'Sun',value:1000} ],
+                    uploads: [ {date:'Mon',value:2},{date:'Tue',value:3},{date:'Wed',value:1},{date:'Thu',value:2},{date:'Fri',value:4},{date:'Sat',value:1},{date:'Sun',value:2} ],
+                    newUsers: [ {date:'Mon',value:1},{date:'Tue',value:2},{date:'Wed',value:0},{date:'Thu',value:1},{date:'Fri',value:2},{date:'Sat',value:1},{date:'Sun',value:1} ]
+                };
+            }
+            // Chart navigation
+            function showChart(type) {
+                document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelector('.chart-btn[data-type="'+type+'"]').classList.add('active');
+                const data = analytics[type].map(d => d.value);
+                const labels = analytics[type].map(d => d.date);
+                let labelText = '';
+                if (type === 'orders') labelText = 'Orders';
+                if (type === 'revenue') labelText = 'Revenue';
+                if (type === 'avgOrder') labelText = 'Avg Order Value';
+                if (type === 'uploads') labelText = 'Product Uploads';
+                if (type === 'newUsers') labelText = 'New Users';
+                renderPerformanceChart(data, labels, labelText);
+            }
+            document.querySelectorAll('.chart-btn').forEach(btn => {
+                btn.onclick = () => showChart(btn.getAttribute('data-type'));
+            });
+            showChart('orders');
+            // Fetch farmers
+            let farmers = [];
+            let products = [];
+            let activity = [];
+            try {
+                const userRes = await fetch('http://localhost:5000/api/users');
+                farmers = await userRes.json();
+            } catch {
+                farmers = [
+                    { name: 'John Doe', email: 'john@farm.com' },
+                    { name: 'Jane Smith', email: 'jane@farm.com' }
+                ];
+            }
+            try {
+                const prodRes = await fetch('http://localhost:5000/api/products');
+                products = await prodRes.json();
+            } catch {
+                products = [
+                    { name: 'Fresh Tomatoes', price: 500, farmer: 'John Doe' },
+                    { name: 'Farm Honey', price: 1500, farmer: 'Jane Smith' }
+                ];
+            }
+            // Simulate activity log
+            activity = products.map(p => `${p.farmer || 'Unknown'} uploaded ${p.name}`);
+
+            // Render farmers
+            const farmersTable = document.getElementById('farmersTable').querySelector('tbody');
+            farmersTable.innerHTML = '';
+            farmers.forEach((farmer, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${farmer.name || farmer.email}</td><td>${farmer.email}</td><td><button onclick="removeFarmer('${farmer._id || idx}')">Remove</button></td>`;
+                farmersTable.appendChild(tr);
+            });
+            // Render products
+            const productsTable = document.getElementById('productsTable').querySelector('tbody');
+            productsTable.innerHTML = '';
+            products.forEach((product, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${product.name}</td><td>₦${product.price}</td><td>${product.farmer || ''}</td><td><button onclick="removeProduct('${product._id || idx}')">Remove</button></td>`;
+                productsTable.appendChild(tr);
+            });
+            // Render activity log
+            const activityLog = document.getElementById('activityLog');
+            activityLog.innerHTML = '';
+            activity.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                activityLog.appendChild(li);
+            });
+        }
+
+        // Remove functions (products only, demo)
+        window.removeProduct = async function(id) {
+            try {
+                await fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' });
+                loadAdminData();
+            } catch {
+                alert('Failed to remove product.');
+            }
+        }
+        window.removeFarmer = function(id) {
+            alert('Farmer removal not implemented.');
+        }
+
+        loadAdminData();
+    </script>
+</body>
+</html>

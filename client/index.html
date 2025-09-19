@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm2Table - Fresh Produce Direct from Farmers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar (Bootstrap) -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-leaf me-2"></i>Farm2Table
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#farmers">Farmers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="community.html">Community</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About Us</a></li>
+                </ul>
+                <div class="d-flex">
+                    <a href="login.html" class="btn btn-outline-primary me-2"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                    <a href="checkout.html" class="btn btn-primary"><i class="fas fa-shopping-cart me-1"></i> Cart</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Carousel (Bootstrap) -->
+    <section class="container mt-4">
+        <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="images/carousel0.jpg" class="d-block w-100" alt="Farmers Market">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Fresh Produce Direct from Local Farmers</h5>
+                        <p>Support local agriculture while enjoying the freshest products delivered to your doorstep.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="images/carousel1.jpg" class="d-block w-100" alt="Organic Bananas">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Organic Bananas</h5>
+                        <p>Clean, natural, and fair — every product counts.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="images/carousel3.jpg" class="d-block w-100" alt="Seafood Selection">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Seafood Selection</h5>
+                        <p>Anchovy, Crab, Fish — delivered fresh.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div
+    </section>
+    <!-- Horizontal Category Navigation -->
+    <nav class="category-nav">
+        <div class="category-list">
+            <div class="category">Vegetables</div>
+            <div class="category">Fruits</div>
+            <div class="category">Grains</div>
+            <div class="category">Poultry</div>
+            <div class="category">Dairy</div>
+        </div>
+    </nav>
+    <main>
+        
+        <!-- Featured Products Grid -->
+        <section class="featured-products">
+            <h2>Featured Products</h2>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search products...">
+                <select id="filterCategory" class="form-select" style="width:auto;display:inline-block;">
+                    <option value="">All Categories</option>
+                    <option value="vegetables">Vegetables</option>
+                    <option value="fruits">Fruits</option>
+                    <option value="grains">Grains</option>
+                    <option value="poultry">Poultry</option>
+                    <option value="dairy">Dairy</option>
+                </select>
+                <input type="number" id="minPrice" placeholder="Min Price" style="width:100px;">
+                <input type="number" id="maxPrice" placeholder="Max Price" style="width:100px;">
+                <select id="minRating" class="form-select" style="width:auto;display:inline-block;">
+                    <option value="">Any Rating</option>
+                    <option value="1">1+</option>
+                    <option value="2">2+</option>
+                    <option value="3">3+</option>
+                    <option value="4">4+</option>
+                    <option value="5">5</option>
+                </select>
+                <button id="searchBtn">Search</button>
+            </div>
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be loaded here by script.js -->
+            </div>
+        </section>
+        <!-- Testimonials -->
+        <section class="testimonials">
+            <h2>What Our Users Are Saying</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p>"I used to struggle to find fresh pepper. Now, I just order from AgroLink and get it the next day!"</p>
+                    <span>— Grace, Lagos</span>
+                </div>
+                <div class="testimonial-card">
+                    <p>"As a farmer, this platform helped me sell directly to buyers. No middlemen stress again and i can always connect with other farmers to learn more about the online marketplace"</p>
+                    <span>— Baba Yusuf, Kano</span>
+                </div>
+                <div class="testimonial-card">
+                    <p>"The chat feature helped me ask the farmer about harvest time. Very helpful and responsive."</p>
+                    <span>— Chidera, Enugu</span>
+                </div>
+            </div>
+        </section>
+        <!-- Features Section (as testimonials) -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h4>Direct from Farm</h4>
+                        <p>Get your products directly from local farmers, ensuring freshness and supporting your community.</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h4>Eco-Friendly</h4>
+                        <p>We promote sustainable farming practices and reduce food miles for a smaller carbon footprint.</p>
+                    </div>
+                    <div class="col-md-4 text-center mb-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4>Secure Payments</h4>
+                        <p>Enjoy peace of mind with our secure payment processing system.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Meet Our Farmers Section -->
+        <section id="farmers" class="farmers-section py-5">
+            <div class="container">
+                <h2 class="section-title">Meet Our Farmers</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="rounded-circle mb-3" alt="Farmer John" width="100">
+                                <h5 class="card-title">John Peterson</h5>
+                                <p class="card-text text-muted">Green Valley Farms</p>
+                                <p class="card-text">Specializes in organic vegetables and sustainable farming practices.</p>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View Products</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="rounded-circle mb-3" alt="Farmer Maria" width="100">
+                                <h5 class="card-title">Maria Rodriguez</h5>
+                                <p class="card-text text-muted">Sunny Berry Farm</p>
+                                <p class="card-text">Grows the sweetest berries using traditional methods passed down for generations.</p>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View Products</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="rounded-circle mb-3" alt="Farmer Tom" width="100">
+                                <h5 class="card-title">Tom Wilson</h5>
+                                <p class="card-text text-muted">Clucky Farm</p>
+                                <p class="card-text">Provides free-range eggs and poultry with a focus on animal welfare.</p>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View Products</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Newsletter Signup -->
+        <section class="newsletter-signup">
+            <h3>Subscribe for Farm Deals & Updates</h3>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </section>
+        <!-- Example Product Modal for Reviews (add after products grid) -->
+        <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">Product Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div id="modalProductInfo"></div>
+                <hr>
+                <h6>Reviews & Ratings</h6>
+                <div id="modalReviews"></div>
+                <form id="reviewForm">
+                  <div class="mb-2">
+                    <label for="reviewRating" class="form-label">Rating</label>
+                    <select id="reviewRating" class="form-select">
+                      <option value="5">5 - Excellent</option>
+                      <option value="4">4 - Good</option>
+                      <option value="3">3 - Average</option>
+                      <option value="2">2 - Poor</option>
+                      <option value="1">1 - Terrible</option>
+                    </select>
+                  </div>
+                  <div class="mb-2">
+                    <label for="reviewComment" class="form-label">Comment</label>
+                    <textarea id="reviewComment" class="form-control" rows="2"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+    </main>
+    <!-- Enhanced Footer -->
+    <footer class="footer-main">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">🌿</div>
+                    <h3>Farm2Table Market</h3>
+                </div>
+                <p class="footer-description">
+                    Connecting you with the finest local farms to bring fresh, organic produce directly to your table. Supporting sustainable agriculture and healthy communities.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link">Facebook</a>
+                    <a href="#" class="social-link">Twitter</a>
+                    <a href="#" class="social-link">Instagram</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Shop All Products</a></li>
+                    <li><a href="#">Fresh Vegetables</a></li>
+                    <li><a href="#">Seasonal Fruits</a></li>
+                    <li><a href="#">Dairy Products</a></li>
+                    <li><a href="#">About Our Farms</a></li>
+                    <li><a href="#">Delivery Info</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Customer Service</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Shipping & Returns</a></li>
+                    <li><a href="#">Quality Guarantee</a></li>
+                    <li><a href="order-tracking.html">Track Your Order</a></li>
+                    <li><a href="#">Become a Partner Farm</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Get in Touch</h4>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>(234) 9161189875</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>hello@farm2tablemarket.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>123 Farm Road<br>Uwana Poly, Ebonyi State</span>
+                    </div>
+                </div>
+                <div class="store-hours">
+                    <p><strong>Store Hours:</strong><br>
+                    Mon-Fri: 7am - 8pm<br>
+                    Sat-Sun: 8am - 6pm</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Farm2Table Marketplace</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+            <small>Built for educational purposes by <strong>Margreth Thompson</strong> 🧑🏽‍💻</small>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+    // Fallback: List featured products with local images in grid
+    const demoProducts = [
+        { name: 'Anchovy Fish', price: 2000, image: 'images/anchovyfish.jpg', category: 'poultry' },
+        { name: 'Banana', price: 500, image: 'images/banana.jpg', category: 'fruits' },
+        { name: 'Blackberry', price: 800, image: 'images/blackberry.jpg', category: 'fruits' },
+        { name: 'Cassava', price: 400, image: 'images/cassava.jpg', category: 'grains' },
+        { name: 'Cow Meat', price: 3500, image: 'images/cowmeat.jpg', category: 'poultry' },
+        { name: 'Drumstick', price: 1200, image: 'images/drumstick.jpg', category: 'poultry' },
+        { name: 'Egg', price: 300, image: 'images/egg.jpg', category: 'dairy' },
+        { name: 'Fresh Crabs', price: 2500, image: 'images/freshcrabs.jpg', category: 'poultry' },
+        { name: 'Hilsa Fish', price: 2200, image: 'images/hilsafish.jpg', category: 'poultry' },
+        { name: 'Lamb Chops', price: 4000, image: 'images/lambchops.jpg', category: 'poultry' },
+        { name: 'Local Crab', price: 1800, image: 'images/localcrab.jpg', category: 'poultry' },
+        { name: 'Minced Beef', price: 3200, image: 'images/mincedbeef.jpg', category: 'poultry' },
+        { name: 'Orange', price: 600, image: 'images/orange.jpg', category: 'fruits' },
+        { name: 'Pineapple', price: 700, image: 'images/pineapple.jpg', category: 'fruits' },
+        { name: 'Red Apple', price: 650, image: 'images/redapple.jpg', category: 'fruits' },
+        { name: 'Red Pear', price: 900, image: 'images/redpear.jpg', category: 'fruits' },
+        { name: 'Red Raspberry', price: 850, image: 'images/redraspberry.jpg', category: 'fruits' },
+        { name: 'Snow Crab', price: 2600, image: 'images/snowcrab.jpg', category: 'poultry' },
+        { name: 'Steak', price: 5000, image: 'images/steak.jpg', category: 'poultry' },
+        { name: 'Strawberry', price: 750, image: 'images/strawberry.jpg', category: 'fruits' },
+        { name: 'White Eggs', price: 350, image: 'images/whiteeggs.jpg', category: 'dairy' }
+    ];
+    function renderProductsGrid() {
+        const grid = document.getElementById('products-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        demoProducts.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p>₦${product.price}</p>
+                <button>Add to Cart</button>
+            `;
+            grid.appendChild(card);
+        });
+    }
+    if (window.location.pathname.endsWith('products.html')) {
+        document.addEventListener('DOMContentLoaded', renderProductsGrid);
+    }
+    </script>
+</body>
+</html>

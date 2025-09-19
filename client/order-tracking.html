@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Tracking & Management - Farm2Table</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .tracking-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tracking-header {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #388e3c;
+        }
+        .order-list {
+            margin-top: 2rem;
+        }
+        .order-card {
+            background: #f1f8e9;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .order-status {
+            font-weight: bold;
+            color: #388e3c;
+        }
+        .order-actions button {
+            background: #388e3c;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+        .order-actions button.cancel {
+            background: #d32f2f;
+        }
+        .tracking-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .tracking-form input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .tracking-form button {
+            background: #388e3c;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        #orderStatus {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="tracking-container">
+        <div class="tracking-header">Track Your Order</div>
+        <form class="tracking-form" id="trackingForm">
+            <input type="text" id="orderIdInput" placeholder="Enter your Order ID" required>
+            <button type="submit">Track</button>
+        </form>
+        <div id="orderStatus"></div>
+    </div>
+    <script>
+        const trackingForm = document.getElementById('trackingForm');
+        const orderIdInput = document.getElementById('orderIdInput');
+        const orderStatus = document.getElementById('orderStatus');
+
+        trackingForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const orderId = orderIdInput.value.trim();
+            if (!orderId) return;
+            orderStatus.innerHTML = '<em>Loading...</em>';
+            try {
+                const res = await fetch(`http://localhost:5000/api/order/${orderId}`);
+                const data = await res.json();
+                if (data.success) {
+                    const order = data.order;
+                    orderStatus.innerHTML = `
+                        <div class="order-status">
+                            <div><strong>Order ID:</strong> ${order.orderId}</div>
+                            <div><strong>Status:</strong> ${order.status}</div>
+                            <div><strong>Amount:</strong> ₦${order.amount}</div>
+                            <div><strong>Products:</strong> ${order.products.map(p => p.name).join(', ')}</div>
+                            <div><strong>Created At:</strong> ${new Date(order.createdAt).toLocaleString()}</div>
+                        </div>
+                    `;
+                } else {
+                    orderStatus.innerHTML = `<div style="color:#d32f2f;font-weight:600;">${data.message || 'Order not found.'}</div>`;
+                }
+            } catch {
+                orderStatus.innerHTML = `<div style="color:#d32f2f;font-weight:600;">Server error. Please try again.</div>`;
+            }
+        });
+    </script>
+    <div class="tracking-container">
+        <div class="tracking-header">Order Tracking & Management</div>
+        <div class="order-list" id="orderList">
+            <!-- Orders will be loaded here -->
+        </div>
+    </div>
+    <script>
+        // Demo: Simulate real-time order tracking
+        let orders = [
+            { id: 'ORD001', product: 'Sweet Banana', status: 'Processing', date: '2025-09-17', amount: 3000 },
+            { id: 'ORD002', product: 'Red Apples', status: 'Shipped', date: '2025-09-16', amount: 1500 },
+            { id: 'ORD003', product: 'Snow Crab', status: 'Delivered', date: '2025-09-15', amount: 1500 },
+            { id: 'ORD004', product: 'Hilsa Fish', status: 'Processing', date: '2025-09-18', amount: 1500 }
+        ];
+        function renderOrders() {
+            const orderList = document.getElementById('orderList');
+            orderList.innerHTML = '';
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                card.innerHTML = `
+                    <div><strong>Order ID:</strong> ${order.id}</div>
+                    <div><strong>Product:</strong> ${order.product}</div>
+                    <div><strong>Date:</strong> ${order.date}</div>
+                    <div><strong>Amount:</strong> ₦${order.amount}</div>
+                    <div class="order-status">Status: ${order.status}</div>
+                    <div class="order-actions">
+                        <button onclick="updateStatus('${order.id}', 'Shipped')">Mark as Shipped</button>
+                        <button onclick="updateStatus('${order.id}', 'Delivered')">Mark as Delivered</button>
+                        <button class="cancel" onclick="updateStatus('${order.id}', 'Cancelled')">Cancel</button>
+                    </div>
+                `;
+                orderList.appendChild(card);
+            });
+        }
+        window.updateStatus = function(id, status) {
+            orders = orders.map(order => order.id === id ? { ...order, status } : order);
+            renderOrders();
+        };
+        // Simulate real-time updates every 10 seconds
+        setInterval(() => {
+            // Randomly update one order status for demo
+            const idx = Math.floor(Math.random() * orders.length);
+            if (orders[idx].status === 'Processing') orders[idx].status = 'Shipped';
+            else if (orders[idx].status === 'Shipped') orders[idx].status = 'Delivered';
+            renderOrders();
+        }, 10000);
+        renderOrders();
+    </script>
+</body>
+</html>

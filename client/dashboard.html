@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard - Farm2Table</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-container {
+            max-width: 800px;
+            margin: 3rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .dashboard-header {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .upload-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .upload-form input, .upload-form textarea, .upload-form select {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .upload-form button {
+            background: #388e3c;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .goods-list {
+            margin-top: 2rem;
+        }
+        .goods-card {
+            background: #f1f8e9;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .goods-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .goods-details {
+            flex: 1;
+        }
+        .goods-details h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        .goods-details p {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">Farmer Dashboard</div>
+        <form class="upload-form" id="uploadForm">
+            <label for="name">Product Name</label>
+            <input type="text" id="name" name="name" required>
+            <label for="price">Price (₦)</label>
+            <input type="number" id="price" name="price" required>
+            <label for="desc">Description</label>
+            <textarea id="desc" name="desc" rows="3" required></textarea>
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+                <option value="">Select Category</option>
+                <option value="vegetables">Vegetables</option>
+                <option value="fruits">Fruits</option>
+                <option value="grains">Grains</option>
+                <option value="poultry">Poultry</option>
+                <option value="dairy">Dairy</option>
+            </select>
+            <label for="imageFile">Product Image</label>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+            <button type="submit">Upload Product</button>
+        </form>
+        <div class="goods-list" id="goodsList">
+            <!-- Uploaded goods will appear here -->
+        </div>
+    </div>
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const goodsList = document.getElementById('goodsList');
+        let goods = [];
+
+        async function loadGoods() {
+            try {
+                const res = await fetch('http://localhost:5000/api/products');
+                goods = await res.json();
+            } catch {
+                goods = [
+                    { name: 'Anchovy Fish', price: 2000, desc: 'Fresh anchovy fish from the farm.', image: 'images/anchovyfish.jpg', category: 'poultry' },
+                    { name: 'Banana', price: 500, desc: 'Organic bananas.', image: 'images/banana.jpg', category: 'fruits' },
+                    { name: 'Cow Meat', price: 3500, desc: 'Premium cow meat.', image: 'images/cowmeat.jpg', category: 'poultry' },
+                    { name: 'Egg', price: 300, desc: 'Farm fresh eggs.', image: 'images/egg.jpg', category: 'dairy' },
+                    { name: 'Strawberry', price: 750, desc: 'Sweet strawberries.', image: 'images/strawberry.jpg', category: 'fruits' }
+                ];
+            }
+            renderGoods();
+        }
+
+        function renderGoods() {
+            goodsList.innerHTML = '';
+            goods.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'goods-card';
+                card.innerHTML = `
+                    <img src="${item.image.startsWith('/uploads/') ? 'http://localhost:5000' + item.image : item.image}" alt="${item.name}" style="width:100%;height:180px;object-fit:cover;border-radius:6px;">
+                    <div class="goods-details">
+                        <h3>${item.name}</h3>
+                        <p>₦${item.price}</p>
+                        <p>${item.desc || ''}</p>
+                        <p><strong>Category:</strong> ${item.category || ''}</p>
+                    </div>
+                `;
+                goodsList.appendChild(card);
+            });
+        }
+
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const price = document.getElementById('price').value;
+            const desc = document.getElementById('desc').value.trim();
+            const category = document.getElementById('category').value;
+            const imageFile = document.getElementById('imageFile').files[0];
+            if (name && price && desc && category && imageFile) {
+                try {
+                    const formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('price', price);
+                    formData.append('desc', desc);
+                    formData.append('farmer', 'Demo Farmer');
+                    formData.append('category', category);
+                    formData.append('imageFile', imageFile);
+                    const res = await fetch('http://localhost:5000/api/products', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const newProduct = await res.json();
+                    goods.push(newProduct);
+                    renderGoods();
+                    uploadForm.reset();
+                } catch {
+                    alert('Failed to upload product.');
+                }
+            }
+        });
+
+        loadGoods();
+    </script>
+</body>
+</html>
