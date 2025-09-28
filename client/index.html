@@ -28,6 +28,7 @@
                 </ul>
                 <div class="d-flex">
                     <a href="login.html" class="btn btn-outline-primary me-2"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                    <a href="login.html#register" class="btn btn-outline-success me-2"><i class="fas fa-user-plus me-1"></i> Register</a>
                     <a href="checkout.html" class="btn btn-primary"><i class="fas fa-shopping-cart me-1"></i> Cart</a>
                 </div>
             </div>
@@ -40,6 +41,9 @@
                 <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                 <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
                 <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="5" aria-label="Slide 6"></button>
             </div>
             <div class="carousel-inner">
                 <div class="carousel-item active">
@@ -61,6 +65,27 @@
                     <div class="carousel-caption d-none d-md-block">
                         <h5>Seafood Selection</h5>
                         <p>Anchovy, Crab, Fish — delivered fresh.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="images/carousel4.jpg" class="d-block w-100" alt="Fresh Vegetables">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Fresh Vegetables</h5>
+                        <p>Locally grown, hand-picked vegetables for your family.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="images/carousel5.jpg" class="d-block w-100" alt="Dairy Products">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Dairy Products</h5>
+                        <p>Pure and fresh dairy from trusted farmers.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="images/carousel6.jpg" class="d-block w-100" alt="Grains & Cereals">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Grains & Cereals</h5>
+                        <p>Nutritious grains for a healthy lifestyle.</p>
                     </div>
                 </div>
             </div>
@@ -316,30 +341,81 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
+        <script>
+        // Fallback: Use demoProducts from script.js and fetch all images from backend for featured products
+        (function() {
+            if (typeof demoProducts === 'undefined') return;
+            function filenameToName(filename) {
+                return filename.replace(/\.[^.]+$/, '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([a-z])([0-9])/gi, '$1 $2').replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b([a-z])/g, c => c.toUpperCase());
+            }
+            async function renderProductsGrid() {
+                const grid = document.getElementById('products-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+                // Show all demo products first
+                demoProducts.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>₦${product.price}</p>
+                        <button>Add to Cart</button>
+                    `;
+                    grid.appendChild(card);
+                });
+                // Fetch all images from backend
+                let imageFiles = [];
+                try {
+                    const res = await fetch('/api/images');
+                    imageFiles = await res.json();
+                } catch {}
+                // Show any new images in images/ not already in demoProducts
+                const demoImageSet = new Set(demoProducts.map(p => p.image.split('/').pop()));
+                imageFiles.forEach(filename => {
+                    if (!demoImageSet.has(filename)) {
+                        const name = filenameToName(filename);
+                        const card = document.createElement('div');
+                        card.className = 'product-card';
+                        card.innerHTML = `
+                            <img src="images/${filename}" alt="${name}">
+                            <h3>${name}</h3>
+                            <p>₦${Math.floor(Math.random()*4000+500)}</p>
+                            <button>Add to Cart</button>
+                        `;
+                        grid.appendChild(card);
+                    }
+                });
+            }
+            if (window.location.pathname.endsWith('products.html') || window.location.pathname.endsWith('index.html')) {
+                document.addEventListener('DOMContentLoaded', renderProductsGrid);
+            }
+        })();
+        </script>
     <script>
     // Fallback: List featured products with local images in grid
     const demoProducts = [
-        { name: 'Anchovy Fish', price: 2000, image: 'images/anchovyfish.jpg', category: 'poultry' },
-        { name: 'Banana', price: 500, image: 'images/banana.jpg', category: 'fruits' },
-        { name: 'Blackberry', price: 800, image: 'images/blackberry.jpg', category: 'fruits' },
-        { name: 'Cassava', price: 400, image: 'images/cassava.jpg', category: 'grains' },
-        { name: 'Cow Meat', price: 3500, image: 'images/cowmeat.jpg', category: 'poultry' },
-        { name: 'Drumstick', price: 1200, image: 'images/drumstick.jpg', category: 'poultry' },
-        { name: 'Egg', price: 300, image: 'images/egg.jpg', category: 'dairy' },
-        { name: 'Fresh Crabs', price: 2500, image: 'images/freshcrabs.jpg', category: 'poultry' },
-        { name: 'Hilsa Fish', price: 2200, image: 'images/hilsafish.jpg', category: 'poultry' },
-        { name: 'Lamb Chops', price: 4000, image: 'images/lambchops.jpg', category: 'poultry' },
-        { name: 'Local Crab', price: 1800, image: 'images/localcrab.jpg', category: 'poultry' },
-        { name: 'Minced Beef', price: 3200, image: 'images/mincedbeef.jpg', category: 'poultry' },
-        { name: 'Orange', price: 600, image: 'images/orange.jpg', category: 'fruits' },
-        { name: 'Pineapple', price: 700, image: 'images/pineapple.jpg', category: 'fruits' },
-        { name: 'Red Apple', price: 650, image: 'images/redapple.jpg', category: 'fruits' },
-        { name: 'Red Pear', price: 900, image: 'images/redpear.jpg', category: 'fruits' },
-        { name: 'Red Raspberry', price: 850, image: 'images/redraspberry.jpg', category: 'fruits' },
-        { name: 'Snow Crab', price: 2600, image: 'images/snowcrab.jpg', category: 'poultry' },
-        { name: 'Steak', price: 5000, image: 'images/steak.jpg', category: 'poultry' },
-        { name: 'Strawberry', price: 750, image: 'images/strawberry.jpg', category: 'fruits' },
-        { name: 'White Eggs', price: 350, image: 'images/whiteeggs.jpg', category: 'dairy' }
+    { name: 'Anchovy Fish', price: 2000, image: 'images/anchovyfish.jpg', category: 'poultry' },
+    { name: 'Banana', price: 500, image: 'images/banana.jpg', category: 'fruits' },
+    { name: 'Blackberry', price: 800, image: 'images/blackberry.jpg', category: 'fruits' },
+    { name: 'Cassava', price: 400, image: 'images/cassava.jpg', category: 'grains' },
+    { name: 'Cow Meat', price: 3500, image: 'images/cowmeat.jpg', category: 'poultry' },
+    { name: 'Drumstick', price: 1200, image: 'images/drumstick.jpg', category: 'poultry' },
+    { name: 'Egg', price: 300, image: 'images/egg.jpg', category: 'dairy' },
+    { name: 'Fresh Crabs', price: 2500, image: 'images/freshcrabs.jpg', category: 'poultry' },
+    { name: 'Hilsa Fish', price: 2200, image: "images/hilsafish'jpg.jpg", category: 'poultry' },
+    { name: 'Lamb Chops', price: 4000, image: 'images/lambchops.jpg', category: 'poultry' },
+    { name: 'Local Crab', price: 1800, image: 'images/localcrab.jpg', category: 'poultry' },
+    { name: 'Minced Beef', price: 3200, image: 'images/mincedbeef.jpg', category: 'poultry' },
+    { name: 'Orange', price: 600, image: 'images/orange.jpg', category: 'fruits' },
+    { name: 'Pineapple', price: 700, image: 'images/pineapple.jpg', category: 'fruits' },
+    { name: 'Red Apple', price: 650, image: 'images/redapple.jpg', category: 'fruits' },
+    { name: 'Red Pear', price: 900, image: 'images/redpear.jpg', category: 'fruits' },
+    { name: 'Red Raspberry', price: 850, image: 'images/redraspberry.jpg', category: 'fruits' },
+    { name: 'Snow Crab', price: 2600, image: 'images/snowcrab.jpg', category: 'poultry' },
+    { name: 'Steak', price: 5000, image: 'images/steak.jpg', category: 'poultry' },
+    { name: 'Strawberry', price: 750, image: 'images/strawberry.jpg', category: 'fruits' },
+    { name: 'White Eggs', price: 350, image: 'images/whiteeggs.jpg', category: 'dairy' }
     ];
     function renderProductsGrid() {
         const grid = document.getElementById('products-grid');

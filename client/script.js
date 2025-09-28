@@ -236,6 +236,90 @@ function addProductCardListeners() {
 }
 
 // After loading products, add listeners
+
+// Product CRUD UI (basic demo)
+const productForm = document.getElementById('productForm');
+if (productForm) {
+    productForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(productForm);
+        let method = 'POST';
+        let url = 'http://localhost:5000/api/products';
+        const productId = productForm.dataset.editId;
+        if (productId) {
+            method = 'PUT';
+            url += '/' + productId;
+        }
+        try {
+            const res = await fetch(url, {
+                method,
+                body: formData
+            });
+            const data = await res.json();
+            if (data._id || data.success) {
+                alert('Product saved!');
+                productForm.reset();
+                productForm.removeAttribute('data-edit-id');
+                loadProducts();
+            } else {
+                alert('Error saving product');
+            }
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    });
+}
+
+// Add edit/delete buttons to product cards (admin/demo only)
+function addProductCardListeners() {
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (e.target.classList.contains('wishlist-icon') || e.target.tagName === 'BUTTON') return;
+            const name = card.querySelector('h3').textContent;
+            const product = demoProducts.find(p => p.name === name) || {};
+            showProductModal(product);
+        });
+        // Add edit/delete buttons if admin
+        if (!card.querySelector('.edit-btn')) {
+            const editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            editBtn.className = 'edit-btn btn btn-sm btn-warning';
+            editBtn.onclick = function(e) {
+                e.stopPropagation();
+                // Fill form for editing
+                if (productForm) {
+                    productForm.elements['name'].value = card.querySelector('h3').textContent;
+                    productForm.elements['price'].value = card.querySelector('p').textContent.replace(/[^\d]/g, '');
+                    productForm.setAttribute('data-edit-id', card.dataset.id);
+                }
+            };
+            card.appendChild(editBtn);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.className = 'delete-btn btn btn-sm btn-danger';
+            deleteBtn.onclick = async function(e) {
+                e.stopPropagation();
+                if (confirm('Delete this product?')) {
+                    const id = card.dataset.id;
+                    try {
+                        const res = await fetch('http://localhost:5000/api/products/' + id, { method: 'DELETE' });
+                        const data = await res.json();
+                        if (data.success) {
+                            alert('Product deleted');
+                            loadProducts();
+                        } else {
+                            alert('Error deleting product');
+                        }
+                    } catch (err) {
+                        alert('Error: ' + err.message);
+                    }
+                }
+            };
+            card.appendChild(deleteBtn);
+        }
+    });
+}
+
 loadProducts().then(addProductCardListeners);
 
 // Review form submit

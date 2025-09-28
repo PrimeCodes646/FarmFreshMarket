@@ -49,7 +49,7 @@
 </head>
 <body>
     <div class="login-container">
-        <h2>Login to Farm2Table</h2>
+        <h2 id="formTitle">Login to Farm2Table</h2>
         <form id="loginForm">
             <label for="role">Select Role</label>
             <select id="role" name="role" required>
@@ -65,9 +65,59 @@
             <div class="error" id="errorMsg"></div>
             <button type="submit">Login</button>
         </form>
+        <form id="registerForm" style="display:none;">
+            <label for="regRole">Select Role</label>
+            <select id="regRole" name="role" required>
+                <option value="">Choose role</option>
+                <option value="admin">Admin</option>
+                <option value="farmer">Farmer</option>
+                <option value="consumer">Consumer</option>
+            </select>
+            <label for="regName">Name</label>
+            <input type="text" id="regName" name="name" required>
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" name="email" required>
+            <label for="regPassword">Password</label>
+            <input type="password" id="regPassword" name="password" required>
+            <div class="error" id="regErrorMsg"></div>
+            <button type="submit">Register</button>
+        </form>
+        <div style="text-align:center;margin-top:1rem;">
+            <a href="#" id="toggleForm">Don't have an account? Register</a>
+        </div>
     </div>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        // Toggle between login and registration forms
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const formTitle = document.getElementById('formTitle');
+        const toggleForm = document.getElementById('toggleForm');
+        function showRegisterForm() {
+            loginForm.style.display = 'none';
+            registerForm.style.display = '';
+            formTitle.textContent = 'Register for Farm2Table';
+            toggleForm.textContent = 'Already have an account? Login';
+        }
+        function showLoginForm() {
+            loginForm.style.display = '';
+            registerForm.style.display = 'none';
+            formTitle.textContent = 'Login to Farm2Table';
+            toggleForm.textContent = "Don't have an account? Register";
+        }
+        toggleForm.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (loginForm.style.display !== 'none') {
+                showRegisterForm();
+            } else {
+                showLoginForm();
+            }
+        });
+        // Show registration form if URL hash is #register
+        if (window.location.hash === '#register') {
+            showRegisterForm();
+        }
+
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const role = document.getElementById('role').value;
             const email = document.getElementById('email').value;
@@ -86,7 +136,6 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    // Redirect based on role
                     if (role === 'admin') {
                         window.location.href = 'admin.html';
                     } else if (role === 'farmer') {
@@ -96,6 +145,36 @@
                     }
                 } else {
                     errorMsg.textContent = data.message || 'Login failed.';
+                }
+            } catch (err) {
+                errorMsg.textContent = 'Server error. Please try again.';
+            }
+        });
+
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const role = document.getElementById('regRole').value;
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const errorMsg = document.getElementById('regErrorMsg');
+            errorMsg.textContent = '';
+            if (!role || !name || !email || !password) {
+                errorMsg.textContent = 'Please fill all fields.';
+                return;
+            }
+            try {
+                const res = await fetch('http://localhost:5000/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role, name, email, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Registration successful! You can now login.');
+                    toggleForm.click();
+                } else {
+                    errorMsg.textContent = data.error || 'Registration failed.';
                 }
             } catch (err) {
                 errorMsg.textContent = 'Server error. Please try again.';

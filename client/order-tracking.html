@@ -127,46 +127,56 @@
         </div>
     </div>
     <script>
-        // Demo: Simulate real-time order tracking
-        let orders = [
-            { id: 'ORD001', product: 'Sweet Banana', status: 'Processing', date: '2025-09-17', amount: 3000 },
-            { id: 'ORD002', product: 'Red Apples', status: 'Shipped', date: '2025-09-16', amount: 1500 },
-            { id: 'ORD003', product: 'Snow Crab', status: 'Delivered', date: '2025-09-15', amount: 1500 },
-            { id: 'ORD004', product: 'Hilsa Fish', status: 'Processing', date: '2025-09-18', amount: 1500 }
-        ];
-        function renderOrders() {
+        // Fetch and render real orders from backend
+        async function fetchOrders() {
+            try {
+                const res = await fetch('http://localhost:5000/api/orders');
+                return await res.json();
+            } catch {
+                return [];
+            }
+        }
+        async function renderOrders() {
             const orderList = document.getElementById('orderList');
             orderList.innerHTML = '';
+            const orders = await fetchOrders();
             orders.forEach(order => {
                 const card = document.createElement('div');
                 card.className = 'order-card';
                 card.innerHTML = `
-                    <div><strong>Order ID:</strong> ${order.id}</div>
-                    <div><strong>Product:</strong> ${order.product}</div>
-                    <div><strong>Date:</strong> ${order.date}</div>
+                    <div><strong>Order ID:</strong> ${order.orderId || order._id}</div>
+                    <div><strong>Consumer:</strong> ${order.consumer || ''}</div>
+                    <div><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</div>
                     <div><strong>Amount:</strong> ₦${order.amount}</div>
+                    <div><strong>Products:</strong> ${(order.products || []).map(p => p.name || p).join(', ')}</div>
                     <div class="order-status">Status: ${order.status}</div>
                     <div class="order-actions">
-                        <button onclick="updateStatus('${order.id}', 'Shipped')">Mark as Shipped</button>
-                        <button onclick="updateStatus('${order.id}', 'Delivered')">Mark as Delivered</button>
-                        <button class="cancel" onclick="updateStatus('${order.id}', 'Cancelled')">Cancel</button>
+                        <button onclick="updateStatus('${order._id}', 'Shipped')">Mark as Shipped</button>
+                        <button onclick="updateStatus('${order._id}', 'Delivered')">Mark as Delivered</button>
+                        <button class="cancel" onclick="deleteOrder('${order._id}')">Delete</button>
                     </div>
                 `;
                 orderList.appendChild(card);
             });
         }
-        window.updateStatus = function(id, status) {
-            orders = orders.map(order => order.id === id ? { ...order, status } : order);
-            renderOrders();
+        window.updateStatus = async function(id, status) {
+            try {
+                await fetch('http://localhost:5000/api/orders/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                renderOrders();
+            } catch {}
         };
-        // Simulate real-time updates every 10 seconds
-        setInterval(() => {
-            // Randomly update one order status for demo
-            const idx = Math.floor(Math.random() * orders.length);
-            if (orders[idx].status === 'Processing') orders[idx].status = 'Shipped';
-            else if (orders[idx].status === 'Shipped') orders[idx].status = 'Delivered';
-            renderOrders();
-        }, 10000);
+        window.deleteOrder = async function(id) {
+            if (confirm('Delete this order?')) {
+                try {
+                    await fetch('http://localhost:5000/api/orders/' + id, { method: 'DELETE' });
+                    renderOrders();
+                } catch {}
+            }
+        };
         renderOrders();
     </script>
 </body>
