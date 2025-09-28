@@ -42,7 +42,7 @@
                 <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
                 <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
                 <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
-                <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                <button type="buttorm -rf .gitn" data-bs-target="#mainCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
                 <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="5" aria-label="Slide 6"></button>
             </div>
             <div class="carousel-inner">
@@ -136,7 +136,7 @@
                 </select>
                 <button id="searchBtn">Search</button>
             </div>
-            <div class="products-grid" id="products-grid">
+            <div class="products-card" id="products-grid">
                 <!-- Products will be loaded here by script.js -->
             </div>
         </section>
@@ -343,56 +343,58 @@
     <script src="script.js"></script>
         <script>
         // Fallback: Use demoProducts from script.js and fetch all images from backend for featured products
-        (function() {
-            if (typeof demoProducts === 'undefined') return;
-            function filenameToName(filename) {
-                return filename.replace(/\.[^.]+$/, '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([a-z])([0-9])/gi, '$1 $2').replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b([a-z])/g, c => c.toUpperCase());
-            }
-            async function renderProductsGrid() {
-                const grid = document.getElementById('products-grid');
-                if (!grid) return;
-                grid.innerHTML = '';
-                // Show all demo products first
-                demoProducts.forEach(product => {
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.innerHTML = `
-                        <img src="${product.image}" alt="${product.name}">
-                        <h3>${product.name}</h3>
-                        <p>₦${product.price}</p>
-                        <button>Add to Cart</button>
-                    `;
-                    grid.appendChild(card);
-                });
-                // Fetch all images from backend
-                let imageFiles = [];
-                try {
-                    const res = await fetch('/api/images');
-                    imageFiles = await res.json();
-                } catch {}
-                // Show any new images in images/ not already in demoProducts
-                const demoImageSet = new Set(demoProducts.map(p => p.image.split('/').pop()));
-                imageFiles.forEach(filename => {
-                    if (!demoImageSet.has(filename)) {
-                        const name = filenameToName(filename);
-                        const card = document.createElement('div');
-                        card.className = 'product-card';
-                        card.innerHTML = `
-                            <img src="images/${filename}" alt="${name}">
-                            <h3>${name}</h3>
-                            <p>₦${Math.floor(Math.random()*4000+500)}</p>
-                            <button>Add to Cart</button>
-                        `;
-                        grid.appendChild(card);
-                    }
-                });
-            }
-            if (window.location.pathname.endsWith('products.html') || window.location.pathname.endsWith('index.html')) {
-                document.addEventListener('DOMContentLoaded', renderProductsGrid);
-            }
-        })();
-        </script>
-    <script>
+        // (function() {
+        //     if (typeof demoProducts === 'undefined') return;
+        //     function filenameToName(filename) {
+        //         return filename.replace(/\.[^.]+$/, '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([a-z])([0-9])/gi, '$1 $2').replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b([a-z])/g, c => c.toUpperCase());
+        //     }
+        //     async function renderProductsGrid() {
+        //         const grid = document.getElementById('products-grid');
+        //         if (!grid) return;
+        //         grid.innerHTML = '';
+        //         // Show all demo products first
+        //         demoProducts.forEach(product => {
+        //             const card = document.createElement('div');
+        //             card.className = 'product-card';
+        //             card.innerHTML = `
+        //                 <img src="${product.image}" alt="${product.name}">
+        //                 <h3>${product.name}</h3>
+        //                 <p>₦${product.price}</p>
+        //                 <button>Add to Cart</button>
+        //             `;
+        //             grid.appendChild(card);
+        //         });
+        //         // Fetch all images from backend
+        //         let imageFiles = [];
+        //         try {
+        //             const res = await fetch('/api/images');
+        //             imageFiles = await res.json();
+        //         } catch {}
+        //         // Show any new images in images/ not already in demoProducts
+        //         const demoImageSet = new Set(demoProducts.map(p => p.image.split('/').pop()));
+        //         imageFiles.forEach(filename => {
+        //             if (!demoImageSet.has(filename)) {
+        //                 const name = filenameToName(filename);
+        //                 const card = document.createElement('div');
+        //                 card.className = 'product-card';
+        //                 card.innerHTML = `
+        //                     <img src="images/${filename}" alt="${name}">
+        //                     <h3>${name}</h3>
+        //                     <p>₦${Math.floor(Math.random()*4000+500)}</p>
+        //                     <button>Add to Cart</button>
+        //                 `;
+        //                 grid.appendChild(card);
+        //             }
+        //         });
+        //     }
+        //     if (window.location.pathname.endsWith('products.html') || window.location.pathname.endsWith('index.html')) {
+        //         document.addEventListener('DOMContentLoaded', renderProductsGrid);
+        //     }
+        // })();
+  // Call the function when the page loads
+  window.addEventListener("DOMContentLoaded", () => {
+    renderProducts(demoProducts);
+  });
     // Fallback: List featured products with local images in grid
     const demoProducts = [
     { name: 'Anchovy Fish', price: 2000, image: 'images/anchovyfish.jpg', category: 'poultry' },
